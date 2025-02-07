@@ -13,6 +13,7 @@
             display: none;
         }
     </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.0.0/crypto-js.min.js"></script>
 </head>
 <body>
 
@@ -33,21 +34,36 @@
     </div>
 
     <script>
-        const correctPassword = 'your_password'; // 替换为你的正确密码
+        const correctPasswordHash = 'your_hashed_password'; // 替换为你服务器端存储的密码哈希值
 
         function login() {
             const password = document.getElementById('password').value;
+            const hashedPassword = CryptoJS.SHA256(password).toString(); // 使用 SHA-256 加密
             const errorMessage = document.getElementById('error-message');
             const loginForm = document.getElementById('login-form');
             const uploadForm = document.getElementById('upload-form');
 
-            if (password === correctPassword) {
-                loginForm.classList.add('hidden');
-                uploadForm.classList.remove('hidden');
-                errorMessage.classList.add('hidden');
-            } else {
-                errorMessage.classList.remove('hidden');
-            }
+            // 发送加密后的密码到服务器进行验证
+            fetch('/admin/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ password: hashedPassword })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    loginForm.classList.add('hidden');
+                    uploadForm.classList.remove('hidden');
+                    errorMessage.classList.add('hidden');
+                } else {
+                    errorMessage.classList.remove('hidden');
+                }
+            })
+            .catch(error => {
+                console.error('登录失败:', error);
+            });
         }
 
         document.getElementById('excel-upload').onsubmit = function(event) {
