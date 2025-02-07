@@ -34,8 +34,6 @@
     </div>
 
     <script>
-        const correctPasswordHash = 'your_hashed_password'; // 替换为你服务器端存储的密码哈希值
-
         function login() {
             const password = document.getElementById('password').value;
             const hashedPassword = CryptoJS.SHA256(password).toString(); // 使用 SHA-256 加密
@@ -44,20 +42,21 @@
             const uploadForm = document.getElementById('upload-form');
 
             // 发送加密后的密码到服务器进行验证
-            fetch('/admin/login', {
+            fetch('http://10.30.10.240:8080/quiz/admin/login', { // 更新为完整的接口地址
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/x-www-form-urlencoded' // 根据接口要求更新 Content-Type
                 },
-                body: JSON.stringify({ password: hashedPassword })
+                body: new URLSearchParams({ inputPassWord: hashedPassword }) // 修改为正确的参数名
             })
             .then(response => response.json())
             .then(data => {
-                if (data.success) {
+                if (data.code === 10000) { // 根据返回的 code 判断成功
                     loginForm.classList.add('hidden');
                     uploadForm.classList.remove('hidden');
                     errorMessage.classList.add('hidden');
                 } else {
+                    errorMessage.textContent = data.message; // 显示错误信息
                     errorMessage.classList.remove('hidden');
                 }
             })
