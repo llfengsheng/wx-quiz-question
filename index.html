@@ -36,33 +36,21 @@
     <script>
         function login() {
             const password = document.getElementById('password').value;
-            const hashedPassword = CryptoJS.SHA256(password).toString(); // 使用 SHA-256 加密
+            const hashedPassword = CryptoJS.SHA256(password).toString();
             const errorMessage = document.getElementById('error-message');
             const loginForm = document.getElementById('login-form');
             const uploadForm = document.getElementById('upload-form');
-
-            // 发送加密后的密码到服务器进行验证
-            fetch('http://10.30.10.240:8080/quiz/admin/login', { // 更新为完整的接口地址
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded' // 根据接口要求更新 Content-Type
-                },
-                body: new URLSearchParams({ inputPassWord: hashedPassword }) // 修改为正确的参数名
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.code === 10000) { // 根据返回的 code 判断成功
-                    loginForm.classList.add('hidden');
-                    uploadForm.classList.remove('hidden');
-                    errorMessage.classList.add('hidden');
-                } else {
-                    errorMessage.textContent = data.message; // 显示错误信息
-                    errorMessage.classList.remove('hidden');
-                }
-            })
-            .catch(error => {
-                console.error('登录失败:', error);
-            });
+            const hashPwd = "d69efd4cb28e33c239f7d1f2526e7eff57ed3d00be4438bdce7db28d18beffa3";
+            
+            if (hashedPassword == hashPwd) {
+                loginForm.classList.add('hidden');
+                uploadForm.classList.remove('hidden');
+                errorMessage.classList.add('hidden');
+            } else {
+                errorMessage.textContent = data.message; // 显示错误信息
+                errorMessage.classList.remove('hidden');
+            }
+            
         }
 
         document.getElementById('excel-upload').onsubmit = function(event) {
