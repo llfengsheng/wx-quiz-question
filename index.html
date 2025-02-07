@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>上传题库</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>请输入密码</h1>
+    <div id="login-form">
+        <input type="password" id="password" placeholder="输入密码" />
+        <button onclick="login()">登录</button>
+        <p id="error-message" style="color: red;" class="hidden">密码错误，请重试。</p>
+    </div>
+
+    <div id="upload-form" class="hidden">
+        <h2>上传Excel题库</h2>
+        <form id="excel-upload" enctype="multipart/form-data">
+            <input type="file" name="file" accept=".xls,.xlsx" required />
+            <button type="submit">上传</button>
+        </form>
+        <p id="upload-message" style="color: green;" class="hidden"></p>
+    </div>
+
+    <script>
+        const correctPassword = 'your_password'; // 替换为你的正确密码
+
+        function login() {
+            const password = document.getElementById('password').value;
+            const errorMessage = document.getElementById('error-message');
+            const loginForm = document.getElementById('login-form');
+            const uploadForm = document.getElementById('upload-form');
+
+            if (password === correctPassword) {
+                loginForm.classList.add('hidden');
+                uploadForm.classList.remove('hidden');
+                errorMessage.classList.add('hidden');
+            } else {
+                errorMessage.classList.remove('hidden');
+            }
+        }
+
+        document.getElementById('excel-upload').onsubmit = function(event) {
+            event.preventDefault(); // 防止页面刷新
+
+            const formData = new FormData(this);
+            fetch('/upload/questions', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                const uploadMessage = document.getElementById('upload-message');
+                uploadMessage.textContent = data.message || '上传成功！';
+                uploadMessage.classList.remove('hidden');
+            })
+            .catch(error => {
+                console.error('上传失败:', error);
+            });
+        };
+    </script>
+
+</body>
+</html>
